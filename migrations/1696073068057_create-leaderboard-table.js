@@ -9,6 +9,10 @@ exports.up = (pgm) => {
             type: 'varchar(100)',
             notNull: true,
         },
+        type: {
+            type: 'integer',
+            notNull: true,
+        },
         score: {
             type: 'integer',
             notNull: true,

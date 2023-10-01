@@ -1,4 +1,5 @@
 const InvalidError = require('../../exceptions/InvalidError');
+const { toTypeInteger } = require('../../utils');
 
 class LeaderboardHandler {
   constructor(service, validator) {
@@ -12,7 +13,10 @@ class LeaderboardHandler {
   async postLeaderboardHandler({payload}, h) {
     const newItem = this._validator.validatePayload(payload);
 
-    const itemId = await this._service.addItem(newItem);
+    const itemId = await this._service.addItem({
+      ...newItem,
+      type: toTypeInteger(newItem.type),
+    });
 
     return h.response({
       error: false,
@@ -27,6 +31,7 @@ class LeaderboardHandler {
     const {
       page,
       pageSize,
+      type,
     } = this._validator.validateQuery(query);
 
     const totalCount = await this._service.getCount();
@@ -36,8 +41,11 @@ class LeaderboardHandler {
       throw new InvalidError('Page exceeds max page');
     }
 
-    const items = await this._service
-        .getLeaderboard(page, pageSize);
+    const items = await this._service.getLeaderboard({
+      page,
+      pageSize,
+      type: toTypeInteger(type),
+    });
 
     return {
       error: false,

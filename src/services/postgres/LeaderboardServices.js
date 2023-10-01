@@ -11,12 +11,12 @@ class LeaderboardServices {
       });
   }
 
-  async addItem({username, score, timeMs}) {
+  async addItem({username, score, timeMs, type}) {
     const query = {
       text: `INSERT INTO \
-            leaderboard(username, score, time_ms) \
-            VALUES($1, $2, $3) RETURNING id`,
-      values: [username, score, timeMs],
+            leaderboard(username, score, time_ms, type) \
+            VALUES($1, $2, $3, $4) RETURNING id`,
+      values: [username, score, timeMs, type],
     };
 
     const {rows} = await this._pool.query(query);
@@ -29,9 +29,10 @@ class LeaderboardServices {
     return resultId;
   }
 
-  async getLeaderboard(page, pageSize) {
+  async getLeaderboard({page, pageSize, type}) {
     const query = {
       text: `SELECT * FROM leaderboard \
+            WHERE type = ${type} \
             ORDER BY score DESC, created_at ASC \
             LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`,
     };
