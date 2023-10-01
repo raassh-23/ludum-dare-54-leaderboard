@@ -1,6 +1,6 @@
-const {Pool} = require('pg');
+const { Pool } = require('pg');
 const InvalidError = require('../../exceptions/InvalidError');
-const {mapLeaderboardDBToModel} = require('../../utils');
+const { mapLeaderboardDBToModel } = require('../../utils');
 
 class LeaderboardServices {
   constructor() {
@@ -11,7 +11,7 @@ class LeaderboardServices {
       });
   }
 
-  async addItem({username, score, timeMs, type}) {
+  async addItem({ username, score, timeMs, type }) {
     const query = {
       text: `INSERT INTO \
             leaderboard(username, score, time_ms, type) \
@@ -19,7 +19,7 @@ class LeaderboardServices {
       values: [username, score, timeMs, type],
     };
 
-    const {rows} = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
     const resultId = rows[0].id;
 
     if (!resultId) {
@@ -29,15 +29,16 @@ class LeaderboardServices {
     return resultId;
   }
 
-  async getLeaderboard({page, pageSize, type}) {
+  async getLeaderboard({ page, pageSize, type }) {
     const query = {
       text: `SELECT * FROM leaderboard \
-            WHERE type = ${type} \
+            WHERE type = $1 \
             ORDER BY score DESC, created_at ASC \
             LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`,
+      values: [type],
     };
 
-    const {rows} = await this._pool.query(query);
+    const { rows } = await this._pool.query(query);
 
     return rows.map(mapLeaderboardDBToModel);
   }
@@ -46,9 +47,9 @@ class LeaderboardServices {
     const query = {
       text: `SELECT COUNT(id) FROM leaderboard`,
     };
-  
-    const {rows} = await this._pool.query(query);
-  
+
+    const { rows } = await this._pool.query(query);
+
     return rows[0].count;
   }
 }
