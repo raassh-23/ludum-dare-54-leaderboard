@@ -1,7 +1,11 @@
 require('dotenv').config();
 
 const { name, version } = require('../package.json');
+const path = require('path');
+
 const Hapi = require('@hapi/hapi');
+const Inert = require('@hapi/inert');
+const Vision = require('@hapi/vision');
 
 const leaderboard = require('./api/leaderboard');
 const LeaderboardServices = require('./services/postgres/LeaderboardServices');
@@ -22,6 +26,11 @@ const init = async () => {
         },
     });
 
+    await server.register([
+        Inert,
+        Vision,
+    ]);
+
     server.route({
         method: 'GET',
         path: '/',
@@ -34,6 +43,18 @@ const init = async () => {
                     version,
                 },
             };
+        },
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/app/{path*}',
+        handler: {
+            directory: {
+                path: path.join(__dirname, '../client/build/'),
+                listing: false,
+                index: true,
+            },
         },
     });
 
