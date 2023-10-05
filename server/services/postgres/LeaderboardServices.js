@@ -32,15 +32,18 @@ class LeaderboardServices {
   async getLeaderboard({ page, pageSize, type }) {
     const query = {};
 
+    const offsetValue = (page - 1) * pageSize;
+
     const select = `SELECT * FROM leaderboard`;
     const order = `ORDER BY score DESC, time_ms ASC, created_at ASC`;
-    const limit = `LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+    const limit = `LIMIT $1 OFFSET $2`;
 
     if (type === 0) {
       query.text = `${select} ${order} ${limit}`;
+      query.values = [pageSize, offsetValue];
     } else {
-      query.text = `${select} WHERE type = $1 ${order} ${limit}`;
-      query.values = [type];
+      query.text = `${select} WHERE type = $3 ${order} ${limit}`;
+      query.values = [pageSize, offsetValue, type];
     }
 
     const { rows } = await this._pool.query(query);

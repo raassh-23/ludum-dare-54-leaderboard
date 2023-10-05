@@ -1,11 +1,9 @@
 require('dotenv').config();
 
-const { name, version } = require('../package.json');
 const path = require('path');
 
 const Hapi = require('@hapi/hapi');
 const Inert = require('@hapi/inert');
-const Vision = require('@hapi/vision');
 
 const leaderboard = require('./api/leaderboard');
 const LeaderboardServices = require('./services/postgres/LeaderboardServices');
@@ -26,37 +24,7 @@ const init = async () => {
         },
     });
 
-    await server.register([
-        Inert,
-        Vision,
-    ]);
-
-    server.route({
-        method: 'GET',
-        path: '/',
-        handler: (request, h) => {
-            return {
-                error: false,
-                message: 'API is running',
-                data: {
-                    name,
-                    version,
-                },
-            };
-        },
-    });
-
-    server.route({
-        method: 'GET',
-        path: '/app/{path*}',
-        handler: {
-            directory: {
-                path: path.join(__dirname, '../client/build/'),
-                listing: false,
-                index: true,
-            },
-        },
-    });
+    await server.register(Inert);
 
     await server.register([
         {
@@ -67,6 +35,18 @@ const init = async () => {
             },
         },
     ]);
+
+    server.route({
+        method: 'GET',
+        path: '/{path*}',
+        handler: {
+            directory: {
+                path: path.join(__dirname, '../client/build/'),
+                listing: false,
+                index: true,
+            },
+        },
+    });
 
     server.ext('onPreResponse', (request, h) => {
         const { response } = request;
