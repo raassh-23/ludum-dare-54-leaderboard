@@ -30,23 +30,35 @@ class LeaderboardServices {
   }
 
   async getLeaderboard({ page, pageSize, type }) {
-    const query = {
-      text: `SELECT * FROM leaderboard \
-            WHERE type = $1 \
-            ORDER BY score DESC, created_at ASC \
-            LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`,
-      values: [type],
-    };
+    const query = {};
+
+    const select = `SELECT * FROM leaderboard`;
+    const order = `ORDER BY score DESC, time_ms ASC, created_at ASC`;
+    const limit = `LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`;
+
+    if (type === 0) {
+      query.text = `${select} ${order} ${limit}`;
+    } else {
+      query.text = `${select} WHERE type = $1 ${order} ${limit}`;
+      query.values = [type];
+    }
 
     const { rows } = await this._pool.query(query);
 
     return rows.map(mapLeaderboardDBToModel);
   }
 
-  async getCount() {
-    const query = {
-      text: `SELECT COUNT(id) FROM leaderboard`,
-    };
+  async getCount(type) {
+    const query = {};
+
+    const select = `SELECT COUNT(id) FROM leaderboard`;
+
+    if (type === 0) {
+      query.text = `${select}`;
+    } else {
+      query.text = `${select} WHERE type = $1`;
+      query.values = [type];
+    }
 
     const { rows } = await this._pool.query(query);
 

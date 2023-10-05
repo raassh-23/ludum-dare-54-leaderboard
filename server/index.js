@@ -76,12 +76,14 @@ const init = async () => {
                 message: response.message,
             }).code(response.statusCode);
         } else if (response instanceof Error) {
-            console.error(response);
+            console.error(request.info.referrer, response);
+
+            const {message, statusCode} = response.output.payload;
 
             return h.response({
                 error: true,
-                message: 'Server error',
-            }).code(500);
+                message,
+            }).code(statusCode);
         }
 
         return response.continue || response;

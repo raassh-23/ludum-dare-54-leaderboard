@@ -17,8 +17,26 @@ const mapLeaderboardDBToModel = ({
   createdAt: created_at,
 });
 
-const toTypeInteger = (type) => type === 'desktop' ? 1 : 2;
-const toTypeString = (type) => type === 1 ? 'desktop' : 'mobile';
+const toTypeInteger = (type) => {
+  switch (type) {
+    case "desktop":
+      return 1;
+    case "mobile":
+      return 2;
+    default:
+      return 0;
+  }
+};
+const toTypeString = (type) => {
+  switch (type) {
+    case 1:
+      return "desktop";
+    case 2:
+      return "mobile";
+    default:
+      return "all";
+  }
+};
 
 module.exports = {
   mapLeaderboardDBToModel,
