@@ -1,6 +1,6 @@
 import { LeaderboardRow } from "./LeaderboardRow";
 
-export function LeaderboardTable({items, offset}) {
+export function LeaderboardTable({items}) {
     return (
         <table>
             <thead>
@@ -14,7 +14,7 @@ export function LeaderboardTable({items, offset}) {
             </thead>
             <tbody>
                 {items.map((item, index) => (
-                    <LeaderboardRow key={item.id} rank={offset + index + 1} {...item} />
+                    <LeaderboardRow key={item.id} {...item} />
                 ))}
             </tbody>
         </table>
