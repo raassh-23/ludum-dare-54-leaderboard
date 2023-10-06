@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { LeaderboardTable } from "./LeaderboardTable";
 import { TextInput } from './TextInput';
 import ReactPaginate from 'react-paginate';
+import { Dropdown } from './Dropdown';
 
 export function Leaderboard() {
     const [loading, setLoading] = useState(true);
@@ -11,6 +12,7 @@ export function Leaderboard() {
     const [maxPage, setMaxPage] = useState(1);
     const [items, setItems] = useState([]);
     const [search, setSearch] = useState("");
+    const [type, setType] = useState("all");
 
     useEffect(() => {
         const constroller = new AbortController();
@@ -21,6 +23,7 @@ export function Leaderboard() {
         url.searchParams.set("page", page);
         url.searchParams.set("pageSize", pageSize);
         url.searchParams.set("search", search);
+        url.searchParams.set("type", type);
 
         fetch(url, {
             signal: constroller.signal,
@@ -49,10 +52,17 @@ export function Leaderboard() {
         })
 
         return (() => constroller.abort());
-    }, [page, pageSize, search]);
+    }, [page, pageSize, search, type]);
 
     return (
         <>
+            <Dropdown
+                label="Played on"
+                name="played-on"
+                value="all"
+                onChange={({ target }) => {setType(target.value); setPage(1)}}
+                items={["all", "desktop", "mobile"]}
+            />
             <TextInput
                 label="Page Size"
                 name="page-size"
