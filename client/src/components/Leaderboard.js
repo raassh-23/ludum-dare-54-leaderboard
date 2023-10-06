@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useReducer } from 'react';
 import { LeaderboardTable } from "./LeaderboardTable";
 import { TextInput } from './TextInput';
 import ReactPaginate from 'react-paginate';
@@ -13,11 +13,13 @@ export function Leaderboard() {
     const [items, setItems] = useState([]);
     const [search, setSearch] = useState("");
     const [type, setType] = useState("all");
+    const [increment, forceUpdate] = useReducer(x => x + 1, 0);
 
     useEffect(() => {
         const constroller = new AbortController();
 
         setLoading(true);
+        setError(null);
 
         const url = new URL("/leaderboard", window.location.origin);
         url.searchParams.set("page", page);
@@ -52,15 +54,15 @@ export function Leaderboard() {
         })
 
         return (() => constroller.abort());
-    }, [page, pageSize, search, type]);
+    }, [page, pageSize, search, type, increment]);
 
     return (
         <>
             <Dropdown
                 label="Played on"
                 name="played-on"
-                value="all"
-                onChange={({ target }) => {setType(target.value); setPage(1)}}
+                value={type}
+                onChange={({ target }) => { setType(target.value); setPage(1) }}
                 items={["all", "desktop", "mobile"]}
             />
             <TextInput
@@ -68,19 +70,22 @@ export function Leaderboard() {
                 name="page-size"
                 type="number"
                 value={pageSize}
-                onChange={({ target }) => {setPageSize(target.value); setPage(1)}}
+                onChange={({ target }) => { setPageSize(target.value); setPage(1) }}
             />
             <TextInput
                 label="Search"
                 name="search"
                 type="text"
                 value={search}
-                onChange={({ target }) => {setSearch(target.value); setPage(1)}}
+                onChange={({ target }) => { setSearch(target.value); setPage(1) }}
             />
             {loading ? (
                 <p>Loading...</p>
             ) : error ? (
-                <p>Error: {error?.message}</p>
+                <>
+                    <p>Something went wrong</p>
+                    <button onClick={() => { forceUpdate(); }}>Retry</button>
+                </>
             ) : (
                 <>
                     <LeaderboardTable items={items} />
@@ -90,6 +95,7 @@ export function Leaderboard() {
                         onPageChange={({ selected }) => setPage(selected + 1)}
                         pageRangeDisplayed={3}
                         pageCount={maxPage}
+                        forcePage={page - 1}
                         previousLabel="< previous"
                         renderOnZeroPageCount={null}
                     />

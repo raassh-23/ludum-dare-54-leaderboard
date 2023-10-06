@@ -1,6 +1,6 @@
 import { LeaderboardRow } from "./LeaderboardRow";
 
-export function LeaderboardTable({items}) {
+export function LeaderboardTable({ items }) {
     return (
         <table>
             <thead>
@@ -13,9 +13,15 @@ export function LeaderboardTable({items}) {
                 </tr>
             </thead>
             <tbody>
-                {items.map((item, index) => (
-                    <LeaderboardRow key={item.id} {...item} />
-                ))}
+                {items.length === 0 ?
+                    <tr>
+                        <td colSpan="5">No items</td>
+                    </tr>
+                    :
+                    items.map((item) => (
+                        <LeaderboardRow key={item.id} {...item} />
+                    ))
+                }
             </tbody>
         </table>
     );
