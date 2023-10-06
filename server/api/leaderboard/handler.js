@@ -32,11 +32,12 @@ class LeaderboardHandler {
       page,
       pageSize,
       type: typeQuery,
+      search,
     } = this._validator.validateQuery(query);
 
     const type = toTypeInteger(typeQuery);
 
-    const totalCount = await this._service.getCount(type);
+    const totalCount = await this._service.getCount(type, search);
     const maxPage = Math.ceil(totalCount / pageSize) || 1;
 
     if (page > maxPage) {
@@ -47,6 +48,7 @@ class LeaderboardHandler {
       page,
       pageSize,
       type,
+      search,
     });
 
     return {

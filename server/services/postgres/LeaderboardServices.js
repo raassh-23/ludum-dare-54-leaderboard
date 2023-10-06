@@ -29,21 +29,23 @@ class LeaderboardServices {
     return resultId;
   }
 
-  async getLeaderboard({ page, pageSize, type }) {
+  async getLeaderboard({ page, pageSize, type, search }) {
     const query = {};
 
     const offsetValue = (page - 1) * pageSize;
 
-    const select = `SELECT * FROM leaderboard`;
-    const order = `ORDER BY score DESC, time_ms ASC, created_at ASC`;
-    const limit = `LIMIT $1 OFFSET $2`;
+    const select = `SELECT * FROM (SELECT *, RANK() OVER (ORDER BY score DESC, time_ms ASC, created_at ASC) rank FROM leaderboard`;
+    const whereSearch = `) as l WHERE username ILIKE $1`;
+    const limit = `LIMIT $2 OFFSET $3`;
+
+    const searchValue = `%${search}%`;
 
     if (type === 0) {
-      query.text = `${select} ${order} ${limit}`;
-      query.values = [pageSize, offsetValue];
+      query.text = `${select} ${whereSearch} ${limit}`;
+      query.values = [searchValue, pageSize, offsetValue];
     } else {
-      query.text = `${select} WHERE type = $3 ${order} ${limit}`;
-      query.values = [pageSize, offsetValue, type];
+      query.text = `${select} WHERE type = $4 ${whereSearch} ${limit}`;
+      query.values = [searchValue, pageSize, offsetValue, type];
     }
 
     const { rows } = await this._pool.query(query);
@@ -51,16 +53,20 @@ class LeaderboardServices {
     return rows.map(mapLeaderboardDBToModel);
   }
 
-  async getCount(type) {
+  async getCount(type, search) {
     const query = {};
 
     const select = `SELECT COUNT(id) FROM leaderboard`;
+    const whereSearch = `WHERE username ILIKE $1`;
+
+    const searchValue = `%${search}%`;
 
     if (type === 0) {
-      query.text = `${select}`;
+      query.text = `${select} ${whereSearch}`;
+      query.values = [searchValue];
     } else {
-      query.text = `${select} WHERE type = $1`;
-      query.values = [type];
+      query.text = `${select} ${whereSearch} AND type = $2`;
+      query.values = [searchValue, type];
     }
 
     const { rows } = await this._pool.query(query);

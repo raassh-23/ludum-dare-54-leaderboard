@@ -3,6 +3,7 @@ const InvalidError = require('../exceptions/InvalidError');
 /* eslint-disable camelcase */
 const mapLeaderboardDBToModel = ({
   id,
+  rank,
   username,
   score,
   time_ms,
@@ -10,6 +11,7 @@ const mapLeaderboardDBToModel = ({
   type,
 }) => ({
   id,
+  rank,
   username,
   score,
   type: toTypeString(type),
