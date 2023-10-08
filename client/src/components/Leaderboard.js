@@ -58,46 +58,75 @@ export function Leaderboard() {
 
     return (
         <>
-            <Dropdown
-                label="Played on"
-                name="played-on"
-                value={type}
-                onChange={({ target }) => { setType(target.value); setPage(1) }}
-                items={["all", "desktop", "mobile"]}
-            />
-            <TextInput
-                label="Page Size"
-                name="page-size"
-                type="number"
-                value={pageSize}
-                onChange={({ target }) => { setPageSize(target.value); setPage(1) }}
-            />
-            <TextInput
-                label="Search"
-                name="search"
-                type="text"
-                value={search}
-                onChange={({ target }) => { setSearch(target.value); setPage(1) }}
-            />
+            <div className="row g-2 mb-3">
+                <div className='col-md-9'>
+                    <div className='row g-2'>
+                        <div className='col-md-3'>
+                            <Dropdown
+                                label="Played on"
+                                name="played-on"
+                                value={type}
+                                onChange={({ target }) => { setType(target.value); setPage(1) }}
+                                items={["All", "Desktop", "Mobile"]}
+                            />
+                        </div>
+                        <div className='col-md-3'>
+                            <TextInput
+                                label="Page Size"
+                                name="page-size"
+                                type="number"
+                                value={pageSize}
+                                onChange={({ target }) => { setPageSize(target.value); setPage(1) }}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className='col-md-3'>
+                    <TextInput
+                        label="Search"
+                        name="search"
+                        type="text"
+                        value={search}
+                        onChange={({ target }) => { setSearch(target.value); setPage(1) }}
+                    />
+                </div>
+            </div>
             {loading ? (
-                <p>Loading...</p>
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
             ) : error ? (
-                <>
-                    <p>Something went wrong</p>
-                    <button onClick={() => { forceUpdate(); }}>Retry</button>
-                </>
+                <div className='text-center'>
+                    <div class="alert alert-danger" role="alert">
+                        <strong> Something went wrong. Please try again.</strong>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm ms-2" onClick={() => { forceUpdate(); }}>Try Again</button>
+                </div>
             ) : (
                 <>
                     <LeaderboardTable items={items} />
                     <ReactPaginate
-                        breakLabel="..."
-                        nextLabel="next >"
                         onPageChange={({ selected }) => setPage(selected + 1)}
                         pageRangeDisplayed={3}
                         pageCount={maxPage}
                         forcePage={page - 1}
-                        previousLabel="< previous"
+                        previousLabel="«"
+                        breakLabel="..."
+                        nextLabel="»"
                         renderOnZeroPageCount={null}
+                        containerClassName='pagination justify-content-center text-dark'
+                        pageClassName='page-item'
+                        pageLinkClassName='page-link'
+                        breakClassName='page-item'
+                        breakLinkClassName='page-link'
+                        activeClassName='active'
+                        disabledClassName='disabled'
+                        previousClassName='page-item'
+                        previousLinkClassName='page-link'
+                        nextClassName='page-item'
+                        nextLinkClassName='page-link'
                     />
                 </>
             )}

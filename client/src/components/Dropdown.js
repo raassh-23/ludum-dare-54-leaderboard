@@ -1,16 +1,16 @@
-export function Dropdown({ label, name, value, onChange, items }) {
+export function Dropdown({ className, label, name, value, onChange, items }) {
     return (
-        <div className="form-group">
-            <label htmlFor={name}>{label}</label>
+        <div className={`input-group ${className}`}>
+            <label htmlFor={name} className="input-group-text">{label}</label>
             <select
-                className="form-control"
+                className="form-select"
                 id={name}
                 name={name}
                 value={value}
                 onChange={onChange}
             >
                 {items.map(item => (
-                    <option key={item} value={item}>{item}</option>
+                    <option key={item.toLowerCase()} value={item.toLowerCase()}>{item}</option>
                 ))}
             </select>
         </div>
