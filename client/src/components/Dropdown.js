@@ -1,4 +1,4 @@
-export function Dropdown({ className, label, name, value, onChange, items }) {
+export function Dropdown({ className = "", label, name, value, onChange, items }) {
     return (
         <div className={`input-group ${className}`}>
             <label htmlFor={name} className="input-group-text">{label}</label>

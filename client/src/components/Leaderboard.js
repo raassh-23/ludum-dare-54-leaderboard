@@ -59,9 +59,9 @@ export function Leaderboard() {
     return (
         <>
             <div className="row g-2 mb-3">
-                <div className='col-md-9'>
+                <div className='col-md-6 col-lg-8'>
                     <div className='row g-2'>
-                        <div className='col-md-3'>
+                        <div className='col-md-6 col-lg-3'>
                             <Dropdown
                                 label="Played on"
                                 name="played-on"
@@ -70,7 +70,7 @@ export function Leaderboard() {
                                 items={["All", "Desktop", "Mobile"]}
                             />
                         </div>
-                        <div className='col-md-3'>
+                        <div className='col-md-6 col-lg-3'>
                             <TextInput
                                 label="Page Size"
                                 name="page-size"
@@ -81,7 +81,7 @@ export function Leaderboard() {
                         </div>
                     </div>
                 </div>
-                <div className='col-md-3'>
+                <div className='col-md-6 col-lg-4'>
                     <TextInput
                         label="Search"
                         name="search"
@@ -92,9 +92,9 @@ export function Leaderboard() {
                 </div>
             </div>
             {loading ? (
-                <div class="text-center">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                <div className="text-center mt-5">
+                    <div className="spinner-border" role="status" style={{width: "3rem", height: "3rem"}}>
+                        <span className="visually-hidden">Loading...</span>
                     </div>
                 </div>
             ) : error ? (
