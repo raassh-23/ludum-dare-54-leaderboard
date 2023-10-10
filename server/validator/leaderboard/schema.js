@@ -10,7 +10,8 @@ const LeaderboardPayloadSchema = Joi.object({
 const LeaderboardQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).default(1),
   pageSize: Joi.number().integer().min(1).default(10),
-  type: Joi.string().valid('desktop', 'mobile').default('desktop'),
+  type: Joi.string().valid('desktop', 'mobile', 'all').default('all'),
+  search: Joi.string().allow('').default(''),
 });
 
 module.exports = {

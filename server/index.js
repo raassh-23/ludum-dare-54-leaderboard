@@ -1,7 +1,9 @@
 require('dotenv').config();
 
-const { name, version } = require('../package.json');
+const path = require('path');
+
 const Hapi = require('@hapi/hapi');
+const Inert = require('@hapi/inert');
 
 const leaderboard = require('./api/leaderboard');
 const LeaderboardServices = require('./services/postgres/LeaderboardServices');
@@ -22,20 +24,7 @@ const init = async () => {
         },
     });
 
-    server.route({
-        method: 'GET',
-        path: '/',
-        handler: (request, h) => {
-            return {
-                error: false,
-                message: 'API is running',
-                data: {
-                    name,
-                    version,
-                },
-            };
-        },
-    });
+    await server.register(Inert);
 
     await server.register([
         {
@@ -47,6 +36,18 @@ const init = async () => {
         },
     ]);
 
+    server.route({
+        method: 'GET',
+        path: '/{path*}',
+        handler: {
+            directory: {
+                path: path.join(__dirname, '../client/build/'),
+                listing: false,
+                index: true,
+            },
+        },
+    });
+
     server.ext('onPreResponse', (request, h) => {
         const { response } = request;
         if (response instanceof ClientError) {
@@ -55,12 +56,14 @@ const init = async () => {
                 message: response.message,
             }).code(response.statusCode);
         } else if (response instanceof Error) {
-            console.error(response);
+            console.error(request.info.referrer, response);
+
+            const {message, statusCode} = response.output.payload;
 
             return h.response({
                 error: true,
-                message: 'Server error',
-            }).code(500);
+                message,
+            }).code(statusCode);
         }
 
         return response.continue || response;

@@ -10,7 +10,7 @@ class LeaderboardHandler {
     this.getLeaderboardHandler = this.getLeaderboardHandler.bind(this);
   }
 
-  async postLeaderboardHandler({payload}, h) {
+  async postLeaderboardHandler({ payload }, h) {
     const newItem = this._validator.validatePayload(payload);
 
     const itemId = await this._service.addItem({
@@ -27,15 +27,18 @@ class LeaderboardHandler {
     }).code(201);
   }
 
-  async getLeaderboardHandler({query}) {
+  async getLeaderboardHandler({ query }) {
     const {
       page,
       pageSize,
-      type,
+      type: typeQuery,
+      search,
     } = this._validator.validateQuery(query);
 
-    const totalCount = await this._service.getCount();
-    const maxPage = Math.ceil(totalCount/pageSize) || 1;
+    const type = toTypeInteger(typeQuery);
+
+    const totalCount = await this._service.getCount(type, search);
+    const maxPage = Math.ceil(totalCount / pageSize) || 1;
 
     if (page > maxPage) {
       throw new InvalidError('Page exceeds max page');
@@ -44,7 +47,8 @@ class LeaderboardHandler {
     const items = await this._service.getLeaderboard({
       page,
       pageSize,
-      type: toTypeInteger(type),
+      type,
+      search,
     });
 
     return {
